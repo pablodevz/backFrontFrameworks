@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert } from 'react-native';
+import { Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { loginUsuario } from '../utils/storage'; // Importa a função que verifica a senha
 
 export default function LoginScreen({ navigation }) {
@@ -18,15 +18,22 @@ export default function LoginScreen({ navigation }) {
       return;
     }
 
+    // Normaliza o email antes de fazer login
+    const emailNormalizado = email.trim().toLowerCase();
+    
+    console.log('🔐 Tentando fazer login com:', emailNormalizado);
+    
     // 2. Verifica no "Banco de Dados" se o usuário existe
-    const res = await loginUsuario(email, senha);
+    const res = await loginUsuario(emailNormalizado, senha);
     
     if (res.sucesso) {
+      console.log('✅ Login bem-sucedido!');
       // 3. Se deu certo, vai para a Home
       navigation.replace('Home');
     } else {
       // 4. Se deu errado, avisa
-      alert(res.msg);
+      console.log('❌ Erro no login:', res.msg);
+      alert(res.msg || 'Email ou senha incorretos.');
     }
   };
 

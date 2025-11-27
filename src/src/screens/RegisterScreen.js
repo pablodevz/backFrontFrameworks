@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import React, { useState } from 'react';
+import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { cadastrarUsuario } from '../utils/storage';
 
 export default function RegisterScreen({ navigation }) {
@@ -34,13 +34,20 @@ export default function RegisterScreen({ navigation }) {
     }
 
     // Se passou por tudo, tenta cadastrar
+    console.log('📝 Iniciando cadastro...');
     const res = await cadastrarUsuario(nome, email, senha);
     
     if (res.sucesso) {
+      console.log('✅ Cadastro realizado com sucesso!');
       alert("Conta criada com sucesso!");
+      // Limpa os campos
+      setNome('');
+      setEmail('');
+      setSenha('');
       navigation.navigate('Login'); 
     } else {
-      alert(res.msg);
+      console.log('❌ Erro no cadastro:', res.msg);
+      alert(res.msg || 'Erro ao criar conta. Tente novamente.');
     }
   };
 
@@ -58,6 +65,12 @@ export default function RegisterScreen({ navigation }) {
 
       <Text style={styles.headerTitle}>Criar Conta</Text>
       <Text style={styles.subTitle}>Preencha seus dados para começar</Text>
+      <View style={styles.infoBox}>
+        <Ionicons name="information-circle" size={16} color="#4A90E2" />
+        <Text style={styles.infoText}>
+          As contas são salvas localmente no dispositivo. Crie sua conta no mesmo dispositivo onde vai usar o app.
+        </Text>
+      </View>
       
       <View style={styles.form}>
         <Text style={styles.label}>Nome Completo</Text>
@@ -109,7 +122,22 @@ const styles = StyleSheet.create({
   backButtonTop: { flexDirection: 'row', alignItems: 'center', marginBottom: 20, alignSelf: 'flex-start', padding: 10 },
   backText: { fontSize: 16, color: '#2C3E50', marginLeft: 5, fontWeight: 'bold' },
   headerTitle: { fontSize: 32, fontWeight: 'bold', color: '#2C3E50', marginBottom: 5 },
-  subTitle: { fontSize: 16, color: '#7F8C8D', marginBottom: 30 },
+  subTitle: { fontSize: 16, color: '#7F8C8D', marginBottom: 15 },
+  infoBox: {
+    flexDirection: 'row',
+    backgroundColor: '#E3F2FD',
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 20,
+    alignItems: 'flex-start',
+  },
+  infoText: {
+    fontSize: 12,
+    color: '#1976D2',
+    marginLeft: 8,
+    flex: 1,
+    lineHeight: 18,
+  },
   form: { width: '100%' },
   label: { fontSize: 14, fontWeight: 'bold', color: '#34495E', marginBottom: 5, marginTop: 10 },
   input: { backgroundColor: '#FFF', padding: 15, borderRadius: 12, borderWidth: 1, borderColor: '#E1E8ED', fontSize: 16 },

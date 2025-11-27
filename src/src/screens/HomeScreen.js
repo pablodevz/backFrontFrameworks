@@ -1,12 +1,11 @@
-import React, { useState, useCallback, useEffect } from 'react'; // <--- Adicione useEffect
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, StatusBar, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { useCallback, useEffect, useState } from 'react'; // <--- Adicione useEffect
+import { FlatList, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import HabitoCard from '../components/HabitoCard';
 import ParabensModal from '../components/ParabensModal'; // <--- IMPORTANTE: Importe o Modal
-import { getHabitos, toggleHabitoStatus, getUsuarioLogado } from '../utils/storage'; 
+import { getHabitos, getUsuarioLogado, logoutUsuario, toggleHabitoStatus } from '../utils/storage';
 
 export default function HomeScreen({ navigation }) {
   const [habitos, setHabitos] = useState([]);
@@ -46,6 +45,30 @@ export default function HomeScreen({ navigation }) {
     setHabitos(novaLista);
   };
 
+  const handleLogout = async () => {
+    try {
+      // Remove a sessão
+      await logoutUsuario();
+      
+      // Limpa o estado local
+      setNomeUsuario('Desenrolado');
+      setHabitos([]);
+      
+      // Navega para Onboarding resetando o stack
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Onboarding' }],
+      });
+    } catch (error) {
+      console.error('Erro ao fazer logout:', error);
+      // Mesmo com erro, tenta navegar
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Onboarding' }],
+      });
+    }
+  };
+
   const habitosFiltrados = habitos.filter(h => 
     filtro === 'Todos' ? true : h.categoria === filtro
   );
@@ -72,13 +95,28 @@ export default function HomeScreen({ navigation }) {
       {/* ----------------------- */}
 
       <View style={styles.header}>
-        <View>
-          <Text style={styles.title}>Olá, {nomeUsuario}!</Text>
+        <View style={styles.headerLeft}>
+          <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">
+            Olá, {nomeUsuario.split(' ')[0]}!
+          </Text>
           <Text style={styles.subtitle}>{habitos.filter(h => h.concluido).length} concluídos hoje</Text>
         </View>
-        <TouchableOpacity onPress={() => navigation.navigate('Sobre')}>
-          <Ionicons name="settings-outline" size={24} color="#FFF" />
-        </TouchableOpacity>
+        <View style={styles.headerButtons}>
+          <TouchableOpacity 
+            onPress={handleLogout}
+            style={styles.logoutButton}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="log-out-outline" size={22} color="#FFF" />
+          </TouchableOpacity>
+          <TouchableOpacity 
+            onPress={() => navigation.navigate('Sobre')}
+            style={styles.settingsButton}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="settings-outline" size={24} color="#FFF" />
+          </TouchableOpacity>
+        </View>
       </View>
 
       <View style={styles.filterContainer}>
@@ -119,10 +157,65 @@ export default function HomeScreen({ navigation }) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F4F6F8' },
-  header: { backgroundColor: '#2C3E50', padding: 30, paddingTop: 50, borderBottomLeftRadius: 20, borderBottomRightRadius: 20, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  title: { fontSize: 24, fontWeight: 'bold', color: '#FFF' },
-  subtitle: { color: '#BDC3C7', marginTop: 5 },
-  filterContainer: { marginTop: -20, height: 50 },
+  header: { 
+    backgroundColor: '#2C3E50', 
+    paddingHorizontal: 20,
+    paddingTop: 50,
+    paddingBottom: 20,
+    borderBottomLeftRadius: 20, 
+    borderBottomRightRadius: 20, 
+    flexDirection: 'row', 
+    justifyContent: 'space-between', 
+    alignItems: 'center',
+    minHeight: 110,
+  },
+  headerLeft: {
+    flex: 1,
+    marginRight: 12,
+    minWidth: 0,
+  },
+  headerButtons: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    gap: 8,
+    flexShrink: 0,
+  },
+  logoutButton: { 
+    padding: 10, 
+    borderRadius: 8, 
+    backgroundColor: 'rgba(231, 76, 60, 0.25)',
+    width: 44,
+    height: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexShrink: 0,
+  },
+  settingsButton: { 
+    padding: 10,
+    width: 44,
+    height: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexShrink: 0,
+  },
+  title: { 
+    fontSize: 22, 
+    fontWeight: 'bold', 
+    color: '#FFF', 
+    flexShrink: 1,
+    maxWidth: '100%',
+  },
+  subtitle: { 
+    color: '#BDC3C7', 
+    marginTop: 4, 
+    fontSize: 13,
+  },
+  filterContainer: { 
+    marginTop: 0, 
+    paddingTop: 15,
+    paddingBottom: 10,
+    backgroundColor: '#F4F6F8',
+  },
   filterBtn: { flexDirection: 'row', backgroundColor: '#FFF', paddingHorizontal: 15, paddingVertical: 8, borderRadius: 20, marginRight: 10, alignItems: 'center', elevation: 2 },
   filterBtnActive: { backgroundColor: '#4A90E2' },
   filterText: { marginLeft: 5, fontWeight: 'bold', color: '#2C3E50' },
