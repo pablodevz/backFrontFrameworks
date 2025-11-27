@@ -195,7 +195,28 @@ Este projeto foi desenvolvido para fins educacionais como parte da avaliação d
 
 ---
 
-**Repositório:** https://github.com/pablodevz/backFrontFrameworks
+## 🔗 Links do Projeto
+
+**Repositório GitHub:** https://github.com/pablodevz/backFrontFrameworks
+
+**Expo Dashboard:** https://expo.dev/accounts/pablocafe/projects/DiariosDeHabitos
+
+**Última Atualização Publicada:**
+- **Branch:** production
+- **Runtime Version:** 1.0.0
+- **Plataformas:** Android, iOS
+- **Update ID:** 752ea384-a057-436c-b886-764e8c11720f
+- **Link:** https://expo.dev/accounts/pablocafe/projects/DiariosDeHabitos/updates/752ea384-a057-436c-b886-764e8c11720f
+
+### 📱 Como Acessar o App Publicado
+
+1. **Via Expo Go:**
+   - Instale o app "Expo Go" no seu celular (Android/iOS)
+   - Abra o Expo Go
+   - Escaneie o QR code do projeto ou acesse: `exp://expo.dev/@pablocafe/DiariosDeHabitos`
+
+2. **Via Link Web:**
+   - Acesse: https://expo.dev/accounts/pablocafe/projects/DiariosDeHabitos
 
 **Versão:** 1.0.0
 
