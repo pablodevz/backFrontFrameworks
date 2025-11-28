@@ -210,28 +210,18 @@ export default function OnboardingScreen({ navigation }) {
               },
             ]}
           >
-            {/* Botão de Login */}
+            {/* Botão de Entrar */}
             <TouchableOpacity 
               style={[styles.button, styles.buttonPrimary]}
               onPress={() => navigation.replace('Login')}
               activeOpacity={0.8}
             >
               <Ionicons name="log-in" size={20} color="#FFF" />
-              <Text style={styles.buttonTextPrimary}>ENTRAR</Text>
-            </TouchableOpacity>
-
-            {/* Botão de Criar Conta */}
-            <TouchableOpacity 
-              style={[styles.button, styles.buttonSecondary]}
-              onPress={() => navigation.navigate('Register')}
-              activeOpacity={0.8}
-            >
-              <Ionicons name="person-add" size={20} color="#2C3E50" />
-              <Text style={styles.buttonTextSecondary}>CRIAR CONTA</Text>
+              <Text style={styles.buttonTextPrimary}>COMEÇAR</Text>
             </TouchableOpacity>
             
             <Text style={styles.disclaimer}>
-              Ao continuar, você concorda com nossos termos
+              Seus dados serão salvos localmente neste dispositivo
             </Text>
           </Animated.View>
         </View>

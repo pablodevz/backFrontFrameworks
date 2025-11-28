@@ -19,16 +19,19 @@ export default function AdminScreen() {
     setEstatisticas(stats);
   };
 
-  const confirmarExclusao = (email) => {
+  const confirmarExclusao = (nome) => {
     if (Platform.OS === 'web') {
-      if (window.confirm("Apagar este usuário?")) apagar(email);
+      if (window.confirm(`Apagar todos os dados do usuário "${nome}"?`)) apagar(nome);
     } else {
-      Alert.alert("Apagar", "Tem certeza?", [{text: "Sim", onPress: () => apagar(email)}, {text: "Não"}]);
+      Alert.alert("Apagar", `Tem certeza que deseja apagar todos os dados de "${nome}"?`, [
+        {text: "Cancelar", style: 'cancel'}, 
+        {text: "Sim", style: 'destructive', onPress: () => apagar(nome)}
+      ]);
     }
   };
 
-  const apagar = async (email) => {
-    await deletarUsuario(email);
+  const apagar = async (nome) => {
+    await deletarUsuario(nome);
     carregar();
   };
 
@@ -79,7 +82,7 @@ export default function AdminScreen() {
         
         <FlatList
           data={users}
-          keyExtractor={item => item.id || item.email}
+          keyExtractor={item => item.nome || `user_${Math.random()}`}
           scrollEnabled={false}
           renderItem={({ item }) => (
             <View style={styles.card}>
@@ -92,27 +95,21 @@ export default function AdminScreen() {
                   </View>
                   <View style={styles.userDetails}>
                     <Text style={styles.nome}>{item.nome || 'Sem nome'}</Text>
-                    <Text style={styles.email}>{item.email}</Text>
                     <View style={styles.metaInfo}>
-                      <Text style={styles.metaText}>
-                        📅 Cadastrado: {formatarData(item.dataCadastro)}
-                      </Text>
-                      {item.ultimoAcesso && (
-                        <Text style={styles.metaText}>
-                          🔄 Último acesso: {formatarData(item.ultimoAcesso)}
-                        </Text>
-                      )}
                       {item.totalHabitos !== undefined && (
                         <Text style={styles.metaText}>
                           ✅ Hábitos: {item.totalHabitos} | Concluídos: {item.habitosConcluidos || 0}
                         </Text>
                       )}
+                      <Text style={styles.metaText}>
+                        💾 Dados salvos localmente neste dispositivo
+                      </Text>
                     </View>
                   </View>
                 </View>
                 <TouchableOpacity 
                   style={styles.deleteButton}
-                  onPress={() => confirmarExclusao(item.email)}
+                  onPress={() => confirmarExclusao(item.nome)}
                 >
                   <Ionicons name="trash-outline" size={22} color="#E74C3C" />
                 </TouchableOpacity>
@@ -231,11 +228,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold', 
     fontSize: 16,
     color: '#2C3E50',
-    marginBottom: 4,
-  },
-  email: { 
-    color: '#7F8C8D',
-    fontSize: 14,
     marginBottom: 8,
   },
   metaInfo: {

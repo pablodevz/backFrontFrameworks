@@ -1,40 +1,31 @@
 import React, { useState } from 'react';
 import { Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { loginUsuario } from '../utils/storage'; // Importa a função que verifica a senha
+import { salvarNomeUsuario } from '../utils/storage';
 
 export default function LoginScreen({ navigation }) {
-  const [email, setEmail] = useState('');
-  const [senha, setSenha] = useState('');
+  const [nome, setNome] = useState('');
 
-  const handleLogin = async () => {
-    // 1. Truque para você acessar o Admin (Digite 'admin' no email)
-    if (email === 'admin') {
+  const handleEntrar = async () => {
+    // Verifica se o nome foi preenchido
+    if (!nome || nome.trim() === '') {
+      alert("Por favor, digite seu nome!");
+      return;
+    }
+
+    // Truque para acessar o Admin (Digite 'admin' no nome)
+    if (nome.trim().toLowerCase() === 'admin') {
       navigation.navigate('Admin');
       return;
     }
 
-    if (!email || !senha) {
-      alert("Digite seu email e senha!");
-      return;
-    }
-
-    // Normaliza o email antes de fazer login
-    const emailNormalizado = email.trim().toLowerCase();
+    // Salva o nome do usuário e cria sessão
+    const nomeNormalizado = nome.trim();
+    await salvarNomeUsuario(nomeNormalizado);
     
-    console.log('🔐 Tentando fazer login com:', emailNormalizado);
+    console.log('✅ Usuário salvo:', nomeNormalizado);
     
-    // 2. Verifica no "Banco de Dados" se o usuário existe
-    const res = await loginUsuario(emailNormalizado, senha);
-    
-    if (res.sucesso) {
-      console.log('✅ Login bem-sucedido!');
-      // 3. Se deu certo, vai para a Home
-      navigation.replace('Home');
-    } else {
-      // 4. Se deu errado, avisa
-      console.log('❌ Erro no login:', res.msg);
-      alert(res.msg || 'Email ou senha incorretos.');
-    }
+    // Redireciona para a Home
+    navigation.replace('Home');
   };
 
   return (
@@ -44,34 +35,27 @@ export default function LoginScreen({ navigation }) {
         style={styles.logo} 
       />
       <Text style={styles.title}>Bem-vindo!</Text>
+      <Text style={styles.subtitle}>Digite seu nome para começar</Text>
 
       <View style={styles.form}>
-        <Text style={styles.label}>Email</Text>
+        <Text style={styles.label}>Seu Nome</Text>
         <TextInput 
           style={styles.input} 
-          placeholder="seu@email.com"
-          value={email} 
-          onChangeText={setEmail} 
-          autoCapitalize="none"
+          placeholder="Ex: João Silva"
+          value={nome} 
+          onChangeText={setNome} 
+          autoCapitalize="words"
+          returnKeyType="done"
+          onSubmitEditing={handleEntrar}
         />
 
-        <Text style={styles.label}>Senha</Text>
-        <TextInput 
-          style={styles.input} 
-          placeholder="********" 
-          value={senha} 
-          onChangeText={setSenha} 
-          secureTextEntry
-        />
-
-        <TouchableOpacity style={styles.btn} onPress={handleLogin}>
+        <TouchableOpacity style={styles.btn} onPress={handleEntrar}>
           <Text style={styles.btnText}>ENTRAR</Text>
         </TouchableOpacity>
 
-        {/* Botão que leva para o Cadastro */}
-        <TouchableOpacity onPress={() => navigation.navigate('Register')} style={{marginTop: 20}}>
-          <Text style={styles.link}>Não tem conta? <Text style={{fontWeight: 'bold'}}>Crie agora</Text></Text>
-        </TouchableOpacity>
+        <Text style={styles.info}>
+          Seus dados serão salvos localmente neste dispositivo
+        </Text>
       </View>
     </View>
   );
@@ -80,11 +64,12 @@ export default function LoginScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#2C3E50', justifyContent: 'center', padding: 20, alignItems: 'center' },
   logo: { width: 80, height: 80, marginBottom: 20 },
-  title: { fontSize: 24, color: '#FFF', fontWeight: 'bold', marginBottom: 30 },
+  title: { fontSize: 24, color: '#FFF', fontWeight: 'bold', marginBottom: 10 },
+  subtitle: { fontSize: 16, color: '#BDC3C7', marginBottom: 30, textAlign: 'center' },
   form: { width: '100%', backgroundColor: '#FFF', padding: 20, borderRadius: 15 },
   label: { fontWeight: 'bold', color: '#333', marginBottom: 5 },
-  input: { backgroundColor: '#F4F6F8', padding: 15, borderRadius: 8, marginBottom: 15, borderWidth: 1, borderColor: '#DDD' },
+  input: { backgroundColor: '#F4F6F8', padding: 15, borderRadius: 8, marginBottom: 15, borderWidth: 1, borderColor: '#DDD', fontSize: 16 },
   btn: { backgroundColor: '#4A90E2', padding: 15, borderRadius: 8, alignItems: 'center', marginTop: 10 },
-  btnText: { color: '#FFF', fontWeight: 'bold' },
-  link: { color: '#4A90E2', textAlign: 'center' }
+  btnText: { color: '#FFF', fontWeight: 'bold', fontSize: 16 },
+  info: { fontSize: 12, color: '#7F8C8D', textAlign: 'center', marginTop: 15, fontStyle: 'italic' }
 });
